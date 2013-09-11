@@ -42,6 +42,8 @@
     self.selectionStyle = UITableViewCellSelectionStyleNone;
     self.textLabel.backgroundColor = [UIColor clearColor];
     
+    self.item.longTextCell = self;
+    
     _textView = [[REPlaceholderTextView alloc] init];
     _textView.translatesAutoresizingMaskIntoConstraints = NO;
     _textView.inputAccessoryView = self.actionBar;

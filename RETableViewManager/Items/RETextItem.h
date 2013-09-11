@@ -25,7 +25,12 @@
 
 #import "RETableViewItem.h"
 
+@class RETableViewTextCell;
+
 @interface RETextItem : RETableViewItem
+
+@property (strong,nonatomic) NSNumber *maxLength;
+@property (strong, nonatomic) RETableViewTextCell *textCell;
 
 // Data and values
 //

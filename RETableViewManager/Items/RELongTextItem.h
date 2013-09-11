@@ -25,8 +25,11 @@
 
 #import "RETextItem.h"
 
+@class RETableViewLongTextCell;
+
 @interface RELongTextItem : RETextItem
 
+@property (strong, nonatomic) RETableViewLongTextCell *longTextCell;
 @property (strong, readwrite, nonatomic) UIColor *placeholderColor;
 @property (assign, readwrite, nonatomic) BOOL editable;
 @property (copy, readwrite, nonatomic) void (^onBeginEditing)(RELongTextItem *item);

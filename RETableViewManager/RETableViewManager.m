@@ -114,6 +114,9 @@ BOOL REDeviceIsUIKit7() {
     self[@"REDateTimeItem"] = @"RETableViewDateTimeCell";
     self[@"RECreditCardItem"] = @"RETableViewCreditCardCell";
     self[@"REMultipleChoiceItem"] = @"RETableViewOptionCell";
+    self[@"REImagePickerItem"] = @"RETableViewCell";
+    self[@"REIconPickerItem"] = @"RETableViewCell";
+    self[@"RECircledImagePickerItem"] = @"RECircledImagePickerCell";
 }
 
 - (void)registerClass:(NSString *)objectClass forCellWithReuseIdentifier:(NSString *)identifier
@@ -203,6 +206,8 @@ BOOL REDeviceIsUIKit7() {
         //
         if ([self.delegate conformsToProtocol:@protocol(RETableViewManagerDelegate)] && [self.delegate respondsToSelector:@selector(tableView:willLoadCell:forRowAtIndexPath:)])
             [self.delegate tableView:tableView willLoadCell:cell forRowAtIndexPath:indexPath];
+        
+        cell.item = item;
         
         [cell cellDidLoad];
         
@@ -516,6 +521,8 @@ BOOL REDeviceIsUIKit7() {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    [tableView deselectRowAtIndexPath:indexPath animated:NO];
+    
     RETableViewSection *section = [self.mutableSections objectAtIndex:indexPath.section];
     id item = [section.items objectAtIndex:indexPath.row];
     if ([item respondsToSelector:@selector(setSelectionHandler:)]) {

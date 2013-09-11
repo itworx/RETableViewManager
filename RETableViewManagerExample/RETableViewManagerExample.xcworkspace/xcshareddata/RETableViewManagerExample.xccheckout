@@ -5,34 +5,34 @@
 	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
 	<false/>
 	<key>IDESourceControlProjectIdentifier</key>
-	<string>91A628DF-7056-4E32-BB95-6106C9FE4BA1</string>
+	<string>3873E318-BC4C-4166-BEE1-1920DFBB4C5B</string>
 	<key>IDESourceControlProjectName</key>
 	<string>RETableViewManagerExample</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>00213686-1ACC-46C9-9B90-2769BCA1244F</key>
-		<string>ssh://github.com/romaonthego/RETableViewManager.git</string>
+		<key>FEBBBAE0-0C23-453A-9520-E2E6A8E22164</key>
+		<string>https://github.com/itworx/RETableViewManager.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>RETableViewManagerExample/RETableViewManagerExample.xcworkspace</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>00213686-1ACC-46C9-9B90-2769BCA1244F</key>
+		<key>FEBBBAE0-0C23-453A-9520-E2E6A8E22164</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://github.com/romaonthego/RETableViewManager.git</string>
+	<string>https://github.com/itworx/RETableViewManager.git</string>
 	<key>IDESourceControlProjectVersion</key>
 	<integer>110</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>00213686-1ACC-46C9-9B90-2769BCA1244F</string>
+	<string>FEBBBAE0-0C23-453A-9520-E2E6A8E22164</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>00213686-1ACC-46C9-9B90-2769BCA1244F</string>
+			<string>FEBBBAE0-0C23-453A-9520-E2E6A8E22164</string>
 			<key>IDESourceControlWCCName</key>
 			<string>RETableViewManager</string>
 		</dict>

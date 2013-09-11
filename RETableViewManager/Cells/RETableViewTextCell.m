@@ -41,6 +41,8 @@
     [super cellDidLoad];
     self.textLabel.backgroundColor = [UIColor clearColor];
     
+    self.item.textCell = self;
+    
     _textField = [[UITextField alloc] initWithFrame:CGRectNull];
     _textField.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
     _textField.inputAccessoryView = self.actionBar;
@@ -138,6 +140,14 @@
     RETableViewCell *cell = (RETableViewCell *)[self.parentTableView cellForRowAtIndexPath:indexPath];
     [cell.responder becomeFirstResponder];
     return YES;
+}
+
+-(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
+{
+    if(!self.item.maxLength)
+        return YES;
+    
+    return (textField.text.length < self.item.maxLength.integerValue || [string isEqualToString:@""]);
 }
 
 @end
