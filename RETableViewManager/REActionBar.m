@@ -50,7 +50,7 @@
     [_navigationControl addTarget:self action:@selector(handleActionBarPreviousNext:) forControlEvents:UIControlEventValueChanged];
     UIBarButtonItem *prevNextWrapper = [[UIBarButtonItem alloc] initWithCustomView:_navigationControl];
     UIBarButtonItem *flexible = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    [self setItems:[NSArray arrayWithObjects:prevNextWrapper, flexible, doneButton, nil]];
+    [self setItems:[NSArray arrayWithObjects:/*prevNextWrapper,*/ flexible, doneButton, nil]];
     self.actionBarDelegate = delegate;
     
     return self;
