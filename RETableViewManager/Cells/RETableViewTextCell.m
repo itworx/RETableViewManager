@@ -101,6 +101,13 @@
 
 - (void)textFieldDidChange:(UITextField *)textField
 {
+    if(self.item.maxLength)
+    {
+        if (textField.text.length > self.item.maxLength.integerValue) {
+            textField.text = [textField.text substringToIndex:self.item.maxLength.integerValue];
+        }
+    }
+
     self.item.value = textField.text;
     if (self.item.onChange)
         self.item.onChange(self.item);
@@ -144,10 +151,7 @@
 
 -(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
-    if(!self.item.maxLength)
-        return YES;
-    
-    return (textField.text.length < self.item.maxLength.integerValue || [string isEqualToString:@""]);
+    return YES;
 }
 
 @end
