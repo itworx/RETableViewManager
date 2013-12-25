@@ -63,6 +63,8 @@ BOOL REDeviceIsUIKit7();
  */
 @interface RETableViewManager : NSObject <UITableViewDelegate, UITableViewDataSource>
 
+@property (strong, nonatomic) NSNumber *transparent;
+
 ///-----------------------------
 /// @name Managing Table View and Sections
 ///-----------------------------

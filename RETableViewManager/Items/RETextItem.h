@@ -29,6 +29,8 @@
 
 @interface RETextItem : RETableViewItem
 
+@property (strong,nonatomic) NSNumber *disabled;
+
 @property (strong,nonatomic) NSNumber *maxLength;
 @property (strong, nonatomic) RETableViewTextCell *textCell;
 
