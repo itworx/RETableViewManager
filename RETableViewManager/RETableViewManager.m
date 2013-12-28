@@ -238,6 +238,10 @@ BOOL REDeviceIsUIKit7() {
     
     [cell cellWillAppear];
     
+    if (self.transparent.boolValue) {
+        cell.backgroundColor = [UIColor clearColor];
+    }
+    
     return cell;
 }
 
