@@ -25,6 +25,7 @@
 
 #import "RETableViewSection.h"
 #import "RETableViewManager.h"
+#import "NSString+RETableViewManagerAdditions.h"
 
 @interface RETableViewSection ()
 
@@ -128,8 +129,8 @@
 {
     CGFloat width = 0;
     for (RETableViewItem *item in self.mutableItems) {
-        if ([item isMemberOfClass:[RETextItem class]] || [item isMemberOfClass:[REDateTimeItem class]] || [item isMemberOfClass:[RENumberItem class]]) {
-            CGSize size = [item.title sizeWithFont:font];
+        if ([item isKindOfClass:[RETextItem class]] || [item isKindOfClass:[REDateTimeItem class]] || [item isKindOfClass:[RERadioItem class]] || [item isKindOfClass:[REMultipleChoiceItem class]] || [item isKindOfClass:[RENumberItem class]]) {
+            CGSize size = [item.title re_sizeWithFont:font];
             width = MAX(width, size.width);
         }
     }
