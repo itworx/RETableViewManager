@@ -12,6 +12,11 @@ Pod::Spec.new do |s|
   s.requires_arc = true
   s.source_files = 'RETableViewManager/Cells', 'RETableViewManager/Items', 'RETableViewManager'
   s.public_header_files = 'RETableViewManager/Cells/*.h', 'RETableViewManager/*.h', 'RETableViewManager/Items/*.h'
+
+  m.pre_install do |pod, target_definition|
+      Dir.chdir(pod.root) do
+      command = "xcodebuild -project RETableViewManager/RETableViewManager.xcodeproj -target Resources CONFIGURATION_BUILD_DIR=../Resources"
+
   s.resources = 'RETableViewManager/RETableViewManager.bundle'
 
   s.ios.deployment_target = '6.0'
