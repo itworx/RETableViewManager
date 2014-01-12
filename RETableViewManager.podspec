@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.source_files = 'RETableViewManager/Cells', 'RETableViewManager/Items', 'RETableViewManager'
   s.public_header_files = 'RETableViewManager/Cells/*.h', 'RETableViewManager/*.h', 'RETableViewManager/Items/*.h'
 
-  m.pre_install do |pod, target_definition|
+  s.pre_install do |pod, target_definition|
     Dir.chdir(pod.root) do
       command = "xcodebuild -project RETableViewManager/RETableViewManager.xcodeproj -target Resources CONFIGURATION_BUILD_DIR=../../Resources 2>&1 > /dev/null"
       unless system(command)
