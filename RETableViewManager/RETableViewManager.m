@@ -44,13 +44,6 @@
     [REValidation registerDefaultErrorMessages];
 }
 
-- (void)dealloc
-{
-    self.delegate = nil;
-    self.tableView.delegate = nil;
-    self.tableView.dataSource = nil;
-}
-
 - (id)init
 {
     @throw [NSException exceptionWithName:NSGenericException reason:@"init not supported, use initWithTableView: instead." userInfo:nil];
@@ -104,9 +97,6 @@
     self[@"REDateTimeItem"] = @"RETableViewDateTimeCell";
     self[@"RECreditCardItem"] = @"RETableViewCreditCardCell";
     self[@"REMultipleChoiceItem"] = @"RETableViewOptionCell";
-    self[@"REImagePickerItem"] = @"RETableViewCell";
-    self[@"REIconPickerItem"] = @"RETableViewCell";
-    self[@"RECircledImagePickerItem"] = @"RECircledImagePickerCell";
     self[@"REPickerItem"] = @"RETableViewPickerCell";
     self[@"RESegmentedItem"] = @"RETableViewSegmentedCell";
     self[@"REInlineDatePickerItem"] = @"RETableViewInlineDatePickerCell";
@@ -237,10 +227,6 @@
         cell.detailTextLabel.text = ((RETableViewItem *)item).detailLabelText;
     
     [cell cellWillAppear];
-    
-    if (self.transparent.boolValue) {
-        cell.backgroundColor = [UIColor clearColor];
-    }
     
     return cell;
 }
@@ -406,11 +392,6 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)sectionIndex
 {
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
-    
-    if (section.headerHeight != RETableViewSectionFooterHeightAutomatic) {
-        return section.headerHeight;
-    }
-    
     if (section.headerView)
         return section.headerView.frame.size.height;
     else if (section.headerTitle.length)
@@ -427,11 +408,6 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)sectionIndex
 {
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
-    
-    if (section.footerHeight != RETableViewSectionFooterHeightAutomatic) {
-        return section.footerHeight;
-    }
-    
     if (section.footerView)
         return section.footerView.frame.size.height;
     else if (section.footerTitle.length)

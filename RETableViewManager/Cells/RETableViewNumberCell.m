@@ -54,9 +54,6 @@
     self.textField.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     self.textField.delegate = self;
     [self.textField addTarget:self action:@selector(textFieldDidChange:) forControlEvents:UIControlEventEditingChanged];
-    if (self.item.disabled.boolValue) {
-        self.textField.enabled = NO;
-    }
     [self.contentView addSubview:self.textField];
 }
 

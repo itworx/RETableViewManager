@@ -28,9 +28,6 @@
 @class RETableViewManager;
 @class RETableViewCellStyle;
 
-static CGFloat const RETableViewSectionHeaderHeightAutomatic = DBL_MAX;
-static CGFloat const RETableViewSectionFooterHeightAutomatic = DBL_MAX;
-
 /**
  Table view section.
  */
@@ -50,16 +47,6 @@ static CGFloat const RETableViewSectionFooterHeightAutomatic = DBL_MAX;
  The title of the footer of the specified section of the table view.
  */
 @property (copy, readwrite, nonatomic) NSString *footerTitle;
-
-/**
- The height of the header of the specified section of the table view.
- */
-@property (assign, readwrite, nonatomic) CGFloat headerHeight;
-
-/**
- The height of the footer of the specified section of the table view.
- */
-@property (assign, readwrite, nonatomic) CGFloat footerHeight;
 
 /**
  A view object to display in the header of the specified section of the table view.
