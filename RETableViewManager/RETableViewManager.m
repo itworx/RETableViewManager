@@ -25,24 +25,6 @@
 
 #import "RETableViewManager.h"
 
-NSUInteger REDeviceSystemMajorVersion() {
-    static NSUInteger _deviceSystemMajorVersion = -1;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _deviceSystemMajorVersion = [[[[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@"."] objectAtIndex:0] intValue];
-    });
-    return _deviceSystemMajorVersion;
-}
-
-BOOL REDeviceIsUIKit7() {
-#ifdef __IPHONE_7_0
-    if (REDeviceSystemMajorVersion() >= 7.0) {
-        return YES;
-    }
-#endif
-    return NO;
-}
-
 @interface RETableViewManager ()
 
 /**
@@ -50,6 +32,7 @@ BOOL REDeviceIsUIKit7() {
  */
 @property (strong, readwrite, nonatomic) NSMutableDictionary *registeredXIBs;
 @property (strong, readwrite, nonatomic) NSMutableArray *mutableSections;
+@property (assign, readonly, nonatomic) CGFloat defaultTableViewSectionHeight;
 
 @end
 
@@ -114,22 +97,34 @@ BOOL REDeviceIsUIKit7() {
     self[@"REDateTimeItem"] = @"RETableViewDateTimeCell";
     self[@"RECreditCardItem"] = @"RETableViewCreditCardCell";
     self[@"REMultipleChoiceItem"] = @"RETableViewOptionCell";
-    self[@"REImagePickerItem"] = @"RETableViewCell";
-    self[@"REIconPickerItem"] = @"RETableViewCell";
-    self[@"RECircledImagePickerItem"] = @"RECircledImagePickerCell";
+    self[@"REPickerItem"] = @"RETableViewPickerCell";
+    self[@"RESegmentedItem"] = @"RETableViewSegmentedCell";
+    self[@"REInlineDatePickerItem"] = @"RETableViewInlineDatePickerCell";
+    self[@"REInlinePickerItem"] = @"RETableViewInlinePickerCell";
+    self[@"REEditBehaviorItem"] = @"REEditBehaviorCell";
+    self[@"REBehaviorTypeItem"] = @"REBehaviorTypeCell";
+    self[@"REImagePickerItem"]  = @"REImagePickerCell";
 }
 
 - (void)registerClass:(NSString *)objectClass forCellWithReuseIdentifier:(NSString *)identifier
 {
+    [self registerClass:objectClass forCellWithReuseIdentifier:identifier bundle:nil];
+}
+
+- (void)registerClass:(NSString *)objectClass forCellWithReuseIdentifier:(NSString *)identifier bundle:(NSBundle *)bundle
+{
     NSAssert(NSClassFromString(objectClass), ([NSString stringWithFormat:@"Item class '%@' does not exist.", objectClass]));
     NSAssert(NSClassFromString(identifier), ([NSString stringWithFormat:@"Cell class '%@' does not exist.", identifier]));
-    self.registeredClasses[objectClass] = identifier;
+    self.registeredClasses[(id <NSCopying>)NSClassFromString(objectClass)] = NSClassFromString(identifier);
     
     // Perform check if a XIB exists with the same name as the cell class
     //
-    if ([[NSBundle mainBundle] pathForResource:identifier ofType:@"nib"]) {
+    if (!bundle)
+        bundle = [NSBundle mainBundle];
+    
+    if ([bundle pathForResource:identifier ofType:@"nib"]) {
         self.registeredXIBs[identifier] = objectClass;
-        [self.tableView registerNib:[UINib nibWithNibName:identifier bundle:nil] forCellReuseIdentifier:objectClass];
+        [self.tableView registerNib:[UINib nibWithNibName:identifier bundle:bundle] forCellReuseIdentifier:objectClass];
     }
 }
 
@@ -147,20 +142,17 @@ BOOL REDeviceIsUIKit7() {
 {
     RETableViewSection *section = [self.mutableSections objectAtIndex:indexPath.section];
     NSObject *item = [section.items objectAtIndex:indexPath.row];
-    Class cellClass;
-    for (NSString *className in self.registeredClasses) {
-        NSString *itemClass = NSStringFromClass([item class]);
-        if ([itemClass isEqualToString:className]) {
-            cellClass = NSClassFromString([self.registeredClasses objectForKey:className]);
-            break;
-        }
-    }
-    return cellClass;
+    return [self.registeredClasses objectForKey:item.class];
 }
 
 - (NSArray *)sections
 {
     return self.mutableSections;
+}
+
+- (CGFloat)defaultTableViewSectionHeight
+{
+    return self.tableView.style == UITableViewStyleGrouped ? 44 : 22;
 }
 
 #pragma mark -
@@ -185,7 +177,7 @@ BOOL REDeviceIsUIKit7() {
     if ([item isKindOfClass:[RETableViewItem class]])
         cellStyle = ((RETableViewItem *)item).style;
     
-    NSString *cellIdentifier = [NSString stringWithFormat:@"RETableViewManager_%@_%i", [item class], cellStyle];
+    NSString *cellIdentifier = [NSString stringWithFormat:@"RETableViewManager_%@_%li", [item class], (long) cellStyle];
     
     Class cellClass = [self classForCellAtIndexPath:indexPath];
     
@@ -206,8 +198,6 @@ BOOL REDeviceIsUIKit7() {
         //
         if ([self.delegate conformsToProtocol:@protocol(RETableViewManagerDelegate)] && [self.delegate respondsToSelector:@selector(tableView:willLoadCell:forRowAtIndexPath:)])
             [self.delegate tableView:tableView willLoadCell:cell forRowAtIndexPath:indexPath];
-        
-        cell.item = item;
         
         [cell cellDidLoad];
         
@@ -237,10 +227,6 @@ BOOL REDeviceIsUIKit7() {
         cell.detailTextLabel.text = ((RETableViewItem *)item).detailLabelText;
     
     [cell cellWillAppear];
-    
-    if (self.transparent.boolValue) {
-        cell.backgroundColor = [UIColor clearColor];
-    }
     
     return cell;
 }
@@ -408,6 +394,8 @@ BOOL REDeviceIsUIKit7() {
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
     if (section.headerView)
         return section.headerView.frame.size.height;
+    else if (section.headerTitle.length)
+        return self.defaultTableViewSectionHeight;
     
     // Forward to UITableView delegate
     //
@@ -422,11 +410,67 @@ BOOL REDeviceIsUIKit7() {
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
     if (section.footerView)
         return section.footerView.frame.size.height;
+    else if (section.footerTitle.length)
+        return self.defaultTableViewSectionHeight;
     
     // Forward to UITableView delegate
     //
     if ([self.delegate conformsToProtocol:@protocol(UITableViewDelegate)] && [self.delegate respondsToSelector:@selector(tableView:heightForFooterInSection:)])
         return [self.delegate tableView:tableView heightForFooterInSection:sectionIndex];
+    
+    return UITableViewAutomaticDimension;
+}
+
+// Estimated height support
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    RETableViewSection *section = [self.mutableSections objectAtIndex:indexPath.section];
+    id item = [section.items objectAtIndex:indexPath.row];
+    
+    // Forward to UITableView delegate
+    //
+    IF_IOS7_OR_GREATER (
+        if ([self.delegate conformsToProtocol:@protocol(UITableViewDelegate)] && [self.delegate respondsToSelector:@selector(tableView:estimatedHeightForRowAtIndexPath:)])
+            return [self.delegate tableView:tableView estimatedHeightForRowAtIndexPath:indexPath];
+    );
+    
+    CGFloat height = [[self classForCellAtIndexPath:indexPath] heightWithItem:item tableViewManager:self];
+    return height ? height : UITableViewAutomaticDimension;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForHeaderInSection:(NSInteger)sectionIndex
+{
+    RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
+    if (section.headerView)
+        return section.headerView.frame.size.height;
+    else if (section.headerTitle.length)
+        return self.defaultTableViewSectionHeight;
+    
+    // Forward to UITableView delegate
+    //
+    IF_IOS7_OR_GREATER (
+        if ([self.delegate conformsToProtocol:@protocol(UITableViewDelegate)] && [self.delegate respondsToSelector:@selector(tableView:estimatedHeightForHeaderInSection:)])
+            return [self.delegate tableView:tableView estimatedHeightForHeaderInSection:sectionIndex];
+    );
+    
+    return UITableViewAutomaticDimension;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForFooterInSection:(NSInteger)sectionIndex
+{
+    RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
+    if (section.footerView)
+        return section.footerView.frame.size.height;
+    else if (section.footerTitle.length)
+        return self.defaultTableViewSectionHeight;
+    
+    // Forward to UITableView delegate
+    //
+    IF_IOS7_OR_GREATER (
+        if ([self.delegate conformsToProtocol:@protocol(UITableViewDelegate)] && [self.delegate respondsToSelector:@selector(tableView:estimatedHeightForFooterInSection:)])
+            return [self.delegate tableView:tableView estimatedHeightForFooterInSection:sectionIndex];
+    );
     
     return UITableViewAutomaticDimension;
 }
@@ -525,8 +569,6 @@ BOOL REDeviceIsUIKit7() {
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    
     RETableViewSection *section = [self.mutableSections objectAtIndex:indexPath.section];
     id item = [section.items objectAtIndex:indexPath.row];
     if ([item respondsToSelector:@selector(setSelectionHandler:)]) {

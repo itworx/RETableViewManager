@@ -1,5 +1,5 @@
 //
-// RENumberItem.h
+// REPickerItem.h
 // RETableViewManager
 //
 // Copyright (c) 2013 Roman Efimov (https://github.com/romaonthego)
@@ -23,14 +23,19 @@
 // THE SOFTWARE.
 //
 
-#import "RETextItem.h"
+#import "RETableViewItem.h"
+#import "REInlinePickerItem.h"
 
-@interface RENumberItem : RETextItem
+@interface REPickerItem : RETableViewItem
 
-@property (copy, readwrite, nonatomic) NSString *format;
-@property (copy, readwrite, nonatomic) void (^onEndEditing)(RENumberItem *item);
+@property (strong, readwrite, nonatomic) NSArray *options;
+@property (strong, readwrite, nonatomic) NSArray *value;
+@property (copy, readwrite, nonatomic) NSString *placeholder;
+@property (assign, readwrite, nonatomic) BOOL inlinePicker;
+@property (strong, readwrite, nonatomic) REInlinePickerItem *inlinePickerItem;
+@property (copy, readwrite, nonatomic) void (^onChange)(REPickerItem *item);
 
-+ (instancetype)itemWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
-- (id)initWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
++ (instancetype)itemWithTitle:(NSString *)title value:(NSArray *)value placeholder:(NSString *)placeholder options:(NSArray *)options;
+- (id)initWithTitle:(NSString *)title value:(NSArray *)value placeholder:(NSString *)placeholder options:(NSArray *)options;
 
 @end

@@ -1,5 +1,5 @@
 //
-// RENumberItem.h
+// RECommonFunctions.m
 // RETableViewManager
 //
 // Copyright (c) 2013 Roman Efimov (https://github.com/romaonthego)
@@ -23,14 +23,27 @@
 // THE SOFTWARE.
 //
 
-#import "RETextItem.h"
+#import "RECommonFunctions.h"
 
-@interface RENumberItem : RETextItem
+BOOL REDeviceIsUIKit7()
+{
+    return REUIKitIsFlatMode();
+}
 
-@property (copy, readwrite, nonatomic) NSString *format;
-@property (copy, readwrite, nonatomic) void (^onEndEditing)(RENumberItem *item);
-
-+ (instancetype)itemWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
-- (id)initWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
-
-@end
+BOOL REUIKitIsFlatMode()
+{
+    static BOOL isUIKitFlatMode = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        if (floor(NSFoundationVersionNumber) > 993.0) {
+            // If your app is running in legacy mode, tintColor will be nil - else it must be set to some color.
+            if (UIApplication.sharedApplication.keyWindow) {
+                isUIKitFlatMode = [UIApplication.sharedApplication.delegate.window performSelector:@selector(tintColor)] != nil;
+            } else {
+                // Possible that we're called early on (e.g. when used in a Storyboard). Adapt and use a temporary window.
+                isUIKitFlatMode = [[UIWindow new] performSelector:@selector(tintColor)] != nil;
+            }
+        }
+    });
+    return isUIKitFlatMode;
+}

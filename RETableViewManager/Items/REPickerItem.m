@@ -1,5 +1,5 @@
 //
-// RENumberItem.h
+// REPickerItem.m
 // RETableViewManager
 //
 // Copyright (c) 2013 Roman Efimov (https://github.com/romaonthego)
@@ -23,14 +23,29 @@
 // THE SOFTWARE.
 //
 
-#import "RETextItem.h"
+#import "REPickerItem.h"
 
-@interface RENumberItem : RETextItem
+@implementation REPickerItem
 
-@property (copy, readwrite, nonatomic) NSString *format;
-@property (copy, readwrite, nonatomic) void (^onEndEditing)(RENumberItem *item);
++ (instancetype)itemWithTitle:(NSString *)title value:(NSArray *)value placeholder:(NSString *)placeholder options:(NSArray *)options
+{
+    return [[self alloc] initWithTitle:title value:value placeholder:placeholder options:options];
+}
 
-+ (instancetype)itemWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
-- (id)initWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
+- (id)initWithTitle:(NSString *)title value:(NSArray *)value placeholder:(NSString *)placeholder options:(NSArray *)options
+{
+    self = [super init];
+    if (!self)
+        return nil;
+    
+    self.title = title;
+    self.value = value;
+    self.style = UITableViewCellStyleValue1;
+    self.placeholder = placeholder;
+    self.value = value;
+    self.options = options;
+    
+    return self;
+}
 
 @end

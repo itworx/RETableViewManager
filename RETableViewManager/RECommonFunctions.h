@@ -1,5 +1,5 @@
 //
-// RENumberItem.h
+// RECommonFunctions.h
 // RETableViewManager
 //
 // Copyright (c) 2013 Roman Efimov (https://github.com/romaonthego)
@@ -23,14 +23,25 @@
 // THE SOFTWARE.
 //
 
-#import "RETextItem.h"
+#import <Foundation/Foundation.h>
 
-@interface RENumberItem : RETextItem
+#ifndef REUIKitIsFlatModeFunction
+#define REUIKitIsFlatModeFunction
+BOOL REUIKitIsFlatMode();
+#endif
 
-@property (copy, readwrite, nonatomic) NSString *format;
-@property (copy, readwrite, nonatomic) void (^onEndEditing)(RENumberItem *item);
+#ifndef kCFCoreFoundationVersionNumber_iOS_6_1
+#define kCFCoreFoundationVersionNumber_iOS_6_1 793.00
+#endif
 
-+ (instancetype)itemWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
-- (id)initWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED > __IPHONE_6_1
+#define IF_IOS7_OR_GREATER(...) \
+if (kCFCoreFoundationVersionNumber > kCFCoreFoundationVersionNumber_iOS_6_1) \
+{ \
+__VA_ARGS__ \
+}
+#else
+#define IF_IOS7_OR_GREATER(...)
+#endif
 
-@end
+BOOL REDeviceIsUIKit7() __attribute__ ((deprecated));

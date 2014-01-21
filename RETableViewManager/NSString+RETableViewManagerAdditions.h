@@ -1,5 +1,5 @@
 //
-// RENumberItem.h
+// NSString+RETableViewManagerAdditions.h
 // RETableViewManager
 //
 // Copyright (c) 2013 Roman Efimov (https://github.com/romaonthego)
@@ -23,14 +23,11 @@
 // THE SOFTWARE.
 //
 
-#import "RETextItem.h"
+#import <Foundation/Foundation.h>
 
-@interface RENumberItem : RETextItem
+@interface NSString (RETableViewManagerAdditions)
 
-@property (copy, readwrite, nonatomic) NSString *format;
-@property (copy, readwrite, nonatomic) void (^onEndEditing)(RENumberItem *item);
-
-+ (instancetype)itemWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
-- (id)initWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
+- (CGSize)re_sizeWithFont:(UIFont *)font;
+- (CGSize)re_sizeWithFont:(UIFont *)font constrainedToSize:(CGSize)size;
 
 @end

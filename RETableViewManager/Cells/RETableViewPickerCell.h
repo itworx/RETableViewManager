@@ -1,5 +1,5 @@
 //
-// RENumberItem.h
+// RETableViewPickerCell.h
 // RETableViewManager
 //
 // Copyright (c) 2013 Roman Efimov (https://github.com/romaonthego)
@@ -23,14 +23,15 @@
 // THE SOFTWARE.
 //
 
-#import "RETextItem.h"
+#import "RETableViewCell.h"
+#import "REPickerItem.h"
 
-@interface RENumberItem : RETextItem
+@interface RETableViewPickerCell : RETableViewCell <UITextFieldDelegate, UIPickerViewDataSource, UIPickerViewDelegate>
 
-@property (copy, readwrite, nonatomic) NSString *format;
-@property (copy, readwrite, nonatomic) void (^onEndEditing)(RENumberItem *item);
-
-+ (instancetype)itemWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
-- (id)initWithTitle:(NSString *)title value:(NSString *)value placeholder:(NSString *)placeholder format:(NSString *)format;
+@property (strong, readonly, nonatomic) UITextField *textField;
+@property (strong, readonly, nonatomic) UILabel *valueLabel;
+@property (strong, readonly, nonatomic) UILabel *placeholderLabel;
+@property (strong, readonly, nonatomic) UIPickerView *pickerView;
+@property (strong, readwrite, nonatomic) REPickerItem *item;
 
 @end
