@@ -44,6 +44,13 @@
     [REValidation registerDefaultErrorMessages];
 }
 
+- (void)dealloc
+{
+    self.delegate = nil;
+    self.tableView.delegate = nil;
+    self.tableView.dataSource = nil;
+}
+
 - (id)init
 {
     @throw [NSException exceptionWithName:NSGenericException reason:@"init not supported, use initWithTableView: instead." userInfo:nil];
@@ -392,6 +399,11 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)sectionIndex
 {
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
+    
+    if (section.headerHeight != RETableViewSectionFooterHeightAutomatic) {
+        return section.headerHeight;
+    }
+    
     if (section.headerView)
         return section.headerView.frame.size.height;
     else if (section.headerTitle.length)
@@ -408,6 +420,11 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)sectionIndex
 {
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
+    
+    if (section.footerHeight != RETableViewSectionFooterHeightAutomatic) {
+        return section.footerHeight;
+    }
+    
     if (section.footerView)
         return section.footerView.frame.size.height;
     else if (section.footerTitle.length)
