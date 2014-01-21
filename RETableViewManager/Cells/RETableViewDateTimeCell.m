@@ -134,6 +134,7 @@
         self.item.inlinePickerItem = [REInlineDatePickerItem itemWithDateTimeItem:self.item];
         [self.section insertItem:self.item.inlinePickerItem atIndex:self.item.indexPath.row + 1];
         [self.tableViewManager.tableView insertRowsAtIndexPaths:@[self.item.inlinePickerItem.indexPath] withRowAnimation:UITableViewRowAnimationFade];
+        [self.tableViewManager.tableView scrollToRowAtIndexPath:self.item.inlinePickerItem.indexPath atScrollPosition:UITableViewScrollPositionBottom animated:YES];
     } else {
         if (selected && self.item.inlineDatePicker && self.item.inlinePickerItem) {
             [self setSelected:NO animated:NO];

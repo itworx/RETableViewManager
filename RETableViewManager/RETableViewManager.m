@@ -104,6 +104,9 @@
     self[@"REDateTimeItem"] = @"RETableViewDateTimeCell";
     self[@"RECreditCardItem"] = @"RETableViewCreditCardCell";
     self[@"REMultipleChoiceItem"] = @"RETableViewOptionCell";
+    self[@"REImagePickerItem"] = @"RETableViewCell";
+    self[@"REIconPickerItem"] = @"RETableViewCell";
+    self[@"RECircledImagePickerItem"] = @"RECircledImagePickerCell";
     self[@"REPickerItem"] = @"RETableViewPickerCell";
     self[@"RESegmentedItem"] = @"RETableViewSegmentedCell";
     self[@"REInlineDatePickerItem"] = @"RETableViewInlineDatePickerCell";
@@ -234,6 +237,10 @@
         cell.detailTextLabel.text = ((RETableViewItem *)item).detailLabelText;
     
     [cell cellWillAppear];
+    
+    if (self.transparent.boolValue) {
+        cell.backgroundColor = [UIColor clearColor];
+    }
     
     return cell;
 }
