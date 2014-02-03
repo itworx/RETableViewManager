@@ -104,6 +104,7 @@
     self[@"REEditBehaviorItem"] = @"REEditBehaviorCell";
     self[@"REBehaviorTypeItem"] = @"REBehaviorTypeCell";
     self[@"REImagePickerItem"]  = @"REImagePickerCell";
+    self[@"REAttendanceTypeItem"] = @"REAttendanceTypeCell";
 }
 
 - (void)registerClass:(NSString *)objectClass forCellWithReuseIdentifier:(NSString *)identifier
@@ -299,14 +300,14 @@
         RETableViewItem *item = [section.items objectAtIndex:indexPath.row];
         if (item.deletionHandlerWithCompletion) {
             item.deletionHandlerWithCompletion(item, ^{
-                [section removeItemAtIndex:indexPath.row];
-                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                //[section removeItemAtIndex:indexPath.row];
+                //[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
             });
         } else {
             if (item.deletionHandler)
                 item.deletionHandler(item);
-            [section removeItemAtIndex:indexPath.row];
-            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+//            [section removeItemAtIndex:indexPath.row];
+  //          [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
         }
     }
     
