@@ -27,7 +27,7 @@
 #import "REInlineDatePickerItem.h"
 
 @interface REDateTimeItem : RETableViewItem
-
+@property (nonatomic, strong) NSNumber *disabled;
 @property (strong, readwrite, nonatomic) NSDate *value;
 @property (copy, readwrite, nonatomic) NSString *placeholder;
 @property (strong, readwrite, nonatomic) NSString *format;
