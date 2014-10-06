@@ -60,8 +60,13 @@
                                                                  attribute:NSLayoutAttributeCenterY
                                                                 multiplier:1.0
                                                                   constant:0]];
-    UISwitch *switchView = self.switchView;
-    [self.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:[switchView]-margin-|" options:0 metrics:metrics views:NSDictionaryOfVariableBindings(switchView)]];
+    [self.contentView addConstraint:[NSLayoutConstraint constraintWithItem:self.switchView
+                                  attribute:NSLayoutAttributeRight
+                                  relatedBy:NSLayoutRelationEqual
+                                     toItem:self.contentView
+                                  attribute:NSLayoutAttributeRight
+                                 multiplier:1.0f
+                                   constant:-15.0f]];
     
     self.textLabel.backgroundColor = [UIColor clearColor];
     self.textLabel.text = self.item.title;
