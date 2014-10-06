@@ -190,7 +190,11 @@
         cellIdentifier = item.cellIdentifier;
     }
     
-    RETableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    RETableViewCell *cell;
+    if (cellClass  != [RETableViewLongTextCell class] && cellClass != [RETableViewBoolCell class] && cellClass != [RETableViewSegmentedCell class])  {
+        cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+    }
+    
     
     void (^loadCell)(RETableViewCell *cell) = ^(RETableViewCell *cell) {
         cell.tableViewManager = self;
