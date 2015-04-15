@@ -93,6 +93,7 @@
     self.datePicker.minuteInterval = self.item.minuteInterval;
     self.dateFormatter.dateFormat = self.item.format;
     self.dateFormatter.locale = self.item.locale;
+    self.dateFormatter.timeZone = self.datePicker.timeZone;
     self.dateLabel.text = self.item.value ? [self.dateFormatter stringFromDate:self.item.value] : @"";
     self.placeholderLabel.text = self.item.placeholder;
     self.placeholderLabel.hidden = self.dateLabel.text.length > 0;
