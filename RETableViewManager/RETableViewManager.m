@@ -166,6 +166,9 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)sectionIndex
 {
+    if (self.mutableSections.count <= sectionIndex) {
+        return 0;
+    }
     return ((RETableViewSection *)[self.mutableSections objectAtIndex:sectionIndex]).items.count;
 }
 
@@ -214,6 +217,7 @@
     
     if (cell == nil) {
         cell = [[cellClass alloc] initWithStyle:cellStyle reuseIdentifier:cellIdentifier];
+
         loadCell(cell);
     }
     
@@ -256,12 +260,18 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)sectionIndex
 {
+    if (self.mutableSections.count <= sectionIndex) {
+        return nil;
+    }
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
     return section.headerTitle;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)sectionIndex
 {
+    if (self.mutableSections.count <= sectionIndex) {
+        return nil;
+    }
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
     return section.footerTitle;
 }
@@ -281,6 +291,9 @@
 
 - (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (self.mutableSections.count <= indexPath.section) {
+        return NO;
+    }
     RETableViewSection *section = [self.mutableSections objectAtIndex:indexPath.section];
     RETableViewItem *item = [section.items objectAtIndex:indexPath.row];
     return item.moveHandler != nil;
@@ -288,12 +301,16 @@
 
 - (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    RETableViewSection *section = [self.mutableSections objectAtIndex:indexPath.section];
-    RETableViewItem *item = [section.items objectAtIndex:indexPath.row];
-    if ([item isKindOfClass:[RETableViewItem class]]) {
-        return item.editingStyle != UITableViewCellEditingStyleNone || item.moveHandler;
+    if (indexPath.section < [self.mutableSections count]) {
+        RETableViewSection *section = [self.mutableSections objectAtIndex:indexPath.section];
+        if (indexPath.row < [section.items count]) {
+            RETableViewItem *item = [section.items objectAtIndex:indexPath.row];
+            if ([item isKindOfClass:[RETableViewItem class]]) {
+                return item.editingStyle != UITableViewCellEditingStyleNone || item.moveHandler;
+            }
+        }
     }
-    
+
     return NO;
 }
 
@@ -304,14 +321,35 @@
         RETableViewItem *item = [section.items objectAtIndex:indexPath.row];
         if (item.deletionHandlerWithCompletion) {
             item.deletionHandlerWithCompletion(item, ^{
-                //[section removeItemAtIndex:indexPath.row];
-                //[tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+
+#pragma mark - TK Change - Start
+//                [section removeItemAtIndex:indexPath.row];
+//                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+#pragma mark - TK Change - End
+                [section removeItemAtIndex:indexPath.row];
+                [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+                
+                for (NSInteger i = indexPath.row; i < section.items.count; i++) {
+                    RETableViewItem *afterItem = [[section items] objectAtIndex:i];
+                    RETableViewCell *cell = (RETableViewCell *)[tableView cellForRowAtIndexPath:afterItem.indexPath];
+                    cell.rowIndex--;
+                }
             });
         } else {
             if (item.deletionHandler)
                 item.deletionHandler(item);
+#pragma mark - TK Change - Start
 //            [section removeItemAtIndex:indexPath.row];
-  //          [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+//            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+#pragma mark - TK Change - End
+            [section removeItemAtIndex:indexPath.row];
+            [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+            
+            for (NSInteger i = indexPath.row; i < section.items.count; i++) {
+                RETableViewItem *afterItem = [[section items] objectAtIndex:i];
+                RETableViewCell *cell = (RETableViewCell *)[tableView cellForRowAtIndexPath:afterItem.indexPath];
+                cell.rowIndex--;
+            }
         }
     }
     
@@ -396,11 +434,36 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)sectionIndex
 {
+    if (self.mutableSections.count <= sectionIndex) {
+        return UITableViewAutomaticDimension;
+    }
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
-    if (section.headerView)
+
+    if (section.headerHeight != RETableViewSectionHeaderHeightAutomatic) {
+        return section.headerHeight;
+    }
+    
+    if (section.headerView) {
         return section.headerView.frame.size.height;
-    else if (section.headerTitle.length)
-        return self.defaultTableViewSectionHeight;
+    } else if (section.headerTitle.length) {
+        if (!UITableViewStyleGrouped) {
+            return self.defaultTableViewSectionHeight;
+        } else {
+            CGFloat headerHeight = 0;
+            CGFloat headerWidth = CGRectGetWidth(CGRectIntegral(tableView.bounds)) - 40.0f; // 40 = 20pt horizontal padding on each side
+        
+            CGSize headerRect = CGSizeMake(headerWidth, RETableViewSectionHeaderHeightAutomatic);
+        
+            CGRect headerFrame = [section.headerTitle boundingRectWithSize:headerRect
+                                                                   options:(NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading)
+                                                                attributes:@{ NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleHeadline] }
+                                                                   context:nil];
+            
+            headerHeight = headerFrame.size.height;
+        
+            return headerHeight + 20.0f;
+        }
+    }
     
     // Forward to UITableView delegate
     //
@@ -412,11 +475,36 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)sectionIndex
 {
+    if (self.mutableSections.count <= sectionIndex) {
+        return UITableViewAutomaticDimension;
+    }
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
-    if (section.footerView)
+
+    if (section.footerHeight != RETableViewSectionFooterHeightAutomatic) {
+        return section.footerHeight;
+    }
+    
+    if (section.footerView) {
         return section.footerView.frame.size.height;
-    else if (section.footerTitle.length)
-        return self.defaultTableViewSectionHeight;
+    } else if (section.footerTitle.length) {
+        if (!UITableViewStyleGrouped) {
+            return self.defaultTableViewSectionHeight;
+        } else {
+            CGFloat footerHeight = 0;
+            CGFloat footerWidth = CGRectGetWidth(CGRectIntegral(tableView.bounds)) - 40.0f; // 40 = 20pt horizontal padding on each side
+        
+            CGSize footerRect = CGSizeMake(footerWidth, RETableViewSectionFooterHeightAutomatic);
+        
+            CGRect footerFrame = [section.footerTitle boundingRectWithSize:footerRect
+                                                                   options:(NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading)
+                                                                attributes:@{ NSFontAttributeName: [UIFont preferredFontForTextStyle:UIFontTextStyleFootnote] }
+                                                                   context:nil];
+            
+            footerHeight = footerFrame.size.height;
+
+            return footerHeight + 10.0f;
+        }
+    }
     
     // Forward to UITableView delegate
     //
@@ -430,60 +518,30 @@
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (self.mutableSections.count <= indexPath.section) {
+        return UITableViewAutomaticDimension;
+    }
     RETableViewSection *section = [self.mutableSections objectAtIndex:indexPath.section];
+
     id item = [section.items objectAtIndex:indexPath.row];
     
     // Forward to UITableView delegate
     //
-    IF_IOS7_OR_GREATER (
-        if ([self.delegate conformsToProtocol:@protocol(UITableViewDelegate)] && [self.delegate respondsToSelector:@selector(tableView:estimatedHeightForRowAtIndexPath:)])
-            return [self.delegate tableView:tableView estimatedHeightForRowAtIndexPath:indexPath];
-    );
+    if ([self.delegate conformsToProtocol:@protocol(UITableViewDelegate)] && [self.delegate respondsToSelector:@selector(tableView:estimatedHeightForRowAtIndexPath:)])
+        return [self.delegate tableView:tableView estimatedHeightForRowAtIndexPath:indexPath];
     
     CGFloat height = [[self classForCellAtIndexPath:indexPath] heightWithItem:item tableViewManager:self];
+
     return height ? height : UITableViewAutomaticDimension;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForHeaderInSection:(NSInteger)sectionIndex
-{
-    RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
-    if (section.headerView)
-        return section.headerView.frame.size.height;
-    else if (section.headerTitle.length)
-        return self.defaultTableViewSectionHeight;
-    
-    // Forward to UITableView delegate
-    //
-    IF_IOS7_OR_GREATER (
-        if ([self.delegate conformsToProtocol:@protocol(UITableViewDelegate)] && [self.delegate respondsToSelector:@selector(tableView:estimatedHeightForHeaderInSection:)])
-            return [self.delegate tableView:tableView estimatedHeightForHeaderInSection:sectionIndex];
-    );
-    
-    return UITableViewAutomaticDimension;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForFooterInSection:(NSInteger)sectionIndex
-{
-    RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
-    if (section.footerView)
-        return section.footerView.frame.size.height;
-    else if (section.footerTitle.length)
-        return self.defaultTableViewSectionHeight;
-    
-    // Forward to UITableView delegate
-    //
-    IF_IOS7_OR_GREATER (
-        if ([self.delegate conformsToProtocol:@protocol(UITableViewDelegate)] && [self.delegate respondsToSelector:@selector(tableView:estimatedHeightForFooterInSection:)])
-            return [self.delegate tableView:tableView estimatedHeightForFooterInSection:sectionIndex];
-    );
-    
-    return UITableViewAutomaticDimension;
 }
 
 // Section header & footer information. Views are preferred over title should you decide to provide both
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)sectionIndex
 {
+    if (self.mutableSections.count <= sectionIndex) {
+        return nil;
+    }
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
     
     // Forward to UITableView delegate
@@ -496,6 +554,9 @@
 
 - (UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)sectionIndex
 {
+    if (self.mutableSections.count <= sectionIndex) {
+        return nil;
+    }
     RETableViewSection *section = [self.mutableSections objectAtIndex:sectionIndex];
     
     // Forward to UITableView delegate
@@ -837,7 +898,7 @@
         [self.delegate scrollViewWillBeginZooming:self.tableView withView:view];
 }
 
-- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(float)scale
+- (void)scrollViewDidEndZooming:(UIScrollView *)scrollView withView:(UIView *)view atScale:(CGFloat)scale
 {
     // Forward to UIScrollView delegate
     //

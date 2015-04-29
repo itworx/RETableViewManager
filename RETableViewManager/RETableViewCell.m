@@ -173,7 +173,7 @@
     CGFloat cellOffset = 10.0;
     CGFloat fieldOffset = 10.0;
     
-    if (REUIKitIsFlatMode() && self.section.style.contentViewMargin <= 0)
+    if (self.section.style.contentViewMargin <= 0)
         cellOffset += 5.0;
     
     UIFont *font = self.textLabel.font;
@@ -284,7 +284,6 @@
         if (!cell)
             [self.parentTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
         cell = (RETableViewCell *)[self.parentTableView cellForRowAtIndexPath:indexPath];
-        [self.responder resignFirstResponder];
         [cell.responder becomeFirstResponder];
     }
 }

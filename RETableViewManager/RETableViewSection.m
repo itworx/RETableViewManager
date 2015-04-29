@@ -26,6 +26,10 @@
 #import "RETableViewSection.h"
 #import "RETableViewManager.h"
 #import "NSString+RETableViewManagerAdditions.h"
+#import <float.h>
+
+CGFloat const RETableViewSectionHeaderHeightAutomatic = DBL_MAX;
+CGFloat const RETableViewSectionFooterHeightAutomatic = DBL_MAX;
 
 @interface RETableViewSection ()
 
@@ -69,7 +73,10 @@
     if (!self)
         return nil;
     
-    self.mutableItems = [[NSMutableArray alloc] init];
+    _mutableItems = [[NSMutableArray alloc] init];
+    _headerHeight = RETableViewSectionHeaderHeightAutomatic;
+    _footerHeight = RETableViewSectionFooterHeightAutomatic;
+    _cellTitlePadding = 5;
     
     return self;
 }
@@ -134,7 +141,7 @@
             width = MAX(width, size.width);
         }
     }
-    return width + 5.0;
+    return width + self.cellTitlePadding;
 }
 
 #pragma mark -

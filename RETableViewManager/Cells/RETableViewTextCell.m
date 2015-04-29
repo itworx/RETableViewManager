@@ -28,11 +28,13 @@
 
 @interface RETableViewTextCell ()
 
-@property (strong, readwrite, nonatomic) UITextField *textField;
+@property (assign, readwrite, nonatomic) BOOL enabled;
 
 @end
 
 @implementation RETableViewTextCell
+
+@synthesize item = _item;
 
 + (BOOL)canFocusWithItem:(RETableViewItem *)item
 {
@@ -41,6 +43,12 @@
 
 #pragma mark -
 #pragma mark Lifecycle
+
+- (void)dealloc {
+    if (_item != nil) {
+        [_item removeObserver:self forKeyPath:@"enabled"];
+    }
+}
 
 - (void)cellDidLoad
 {
@@ -84,9 +92,9 @@
     self.textField.clearButtonMode = self.item.clearButtonMode;
     self.textField.clearsOnBeginEditing = self.item.clearsOnBeginEditing;
     
-    if (REUIKitIsFlatMode()) {
-        self.actionBar.barStyle = self.item.keyboardAppearance == UIKeyboardAppearanceAlert ? UIBarStyleBlack : UIBarStyleDefault;
-    }
+    self.actionBar.barStyle = self.item.keyboardAppearance == UIKeyboardAppearanceAlert ? UIBarStyleBlack : UIBarStyleDefault;
+    
+    self.enabled = self.item.enabled;
 }
 
 - (UIResponder *)responder
@@ -102,6 +110,38 @@
     
     if ([self.tableViewManager.delegate respondsToSelector:@selector(tableView:willLayoutCellSubviews:forRowAtIndexPath:)])
         [self.tableViewManager.delegate tableView:self.tableViewManager.tableView willLayoutCellSubviews:self forRowAtIndexPath:[self.tableViewManager.tableView indexPathForCell:self]];
+}
+
+#pragma mark -
+#pragma mark Handle state
+
+- (void)setItem:(RETextItem *)item
+{
+    if (_item != nil) {
+        [_item removeObserver:self forKeyPath:@"enabled"];
+    }
+    
+    _item = item;
+    
+    [_item addObserver:self forKeyPath:@"enabled" options:NSKeyValueObservingOptionNew context:NULL];
+}
+
+- (void)setEnabled:(BOOL)enabled {
+    _enabled = enabled;
+    
+    self.userInteractionEnabled = _enabled;
+    
+    self.textLabel.enabled = _enabled;
+    self.textField.enabled = _enabled;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([object isKindOfClass:[REBoolItem class]] && [keyPath isEqualToString:@"enabled"]) {
+        BOOL newValue = [[change objectForKey: NSKeyValueChangeNewKey] boolValue];
+        
+        self.enabled = newValue;
+    }
 }
 
 #pragma mark -
@@ -161,15 +201,17 @@
 
 - (BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string
 {
-    if (self.item.onChangeCharacterInRange)
-        self.item.onChangeCharacterInRange(self.item, range, string);
+    BOOL shouldChange = YES;
     
     if (self.item.charactersLimit) {
         NSUInteger newLength = textField.text.length + string.length - range.length;
-        return newLength <= self.item.charactersLimit;
+        shouldChange = newLength <= self.item.charactersLimit;
     }
     
-    return YES;
+    if (self.item.onChangeCharacterInRange && shouldChange)
+        shouldChange = self.item.onChangeCharacterInRange(self.item, range, string);
+    
+    return shouldChange;
 }
 
 

@@ -28,6 +28,9 @@
 @class RETableViewManager;
 @class RETableViewCellStyle;
 
+extern CGFloat const RETableViewSectionHeaderHeightAutomatic;
+extern CGFloat const RETableViewSectionFooterHeightAutomatic;
+
 /**
  Table view section.
  */
@@ -47,6 +50,16 @@
  The title of the footer of the specified section of the table view.
  */
 @property (copy, readwrite, nonatomic) NSString *footerTitle;
+
+/**
+ The height of the header of the specified section of the table view.
+ */
+@property (assign, readwrite, nonatomic) CGFloat headerHeight;
+
+/**
+ The height of the footer of the specified section of the table view.
+ */
+@property (assign, readwrite, nonatomic) CGFloat footerHeight;
 
 /**
  A view object to display in the header of the specified section of the table view.
@@ -72,6 +85,11 @@
  Section index title.
  */
 @property (copy, readwrite, nonatomic) NSString *indexTitle;
+
+/**
+ The width of padding between the cell title and cell detail view
+ */
+@property (assign, readwrite, nonatomic) CGFloat cellTitlePadding;
 
 /**
  Returns the width of the longest title in the section.
